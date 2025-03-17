@@ -13,6 +13,7 @@ interface ModalFormType<
 > {
   format: T;
   validationSchema: U;
+  values?: any;
   actionButtonDetails: {
     name: string;
     color: string;
@@ -26,10 +27,11 @@ const ModalForm = <
 >({
   format,
   validationSchema,
+  values,
   actionButtonDetails,
 }: ModalFormType<T, U>) => {
   const FORMAT = format;
-
+  console.log("Existing data==> ", values);
   const {
     register,
     handleSubmit,
@@ -74,8 +76,8 @@ const ModalForm = <
                         <>
                           <input
                             type={inp.type}
-                            // name={inp.name}
                             value={optn.value}
+                            checked={values?.[inp.name] === optn.value}
                             {...register(inp.name)}
                           />
                           {optn.label}
@@ -89,11 +91,12 @@ const ModalForm = <
                 ) : inp.type === "checkbox" ? (
                   <div>
                     <div className="flex justify-center items-center gap-2">
-                      <input type={inp?.type} {...register(inp.name)} />
+                      <input
+                        type={inp?.type}
+                        {...register(inp.name)}
+                        checked={values?.[inp.name] === true}
+                      />
                       <label>{inp?.label}</label>
-                      <p className="text-red-500 text-sm">
-                        {errors[inp.name]?.message}
-                      </p>
                     </div>
                     <p className="text-red-500 text-sm">
                       {errors[inp.name]?.message}
@@ -107,8 +110,11 @@ const ModalForm = <
                         {...register(inp.name)}
                       >
                         {inp.options?.map((opt, ind) => (
-                          <option value={opt.value}>
-                            {opt.label} key={ind}
+                          <option
+                            value={opt.value}
+                            selected={opt.value === values?.[inp.name]}
+                          >
+                            {opt.label}
                           </option>
                         ))}
                       </select>
@@ -123,6 +129,7 @@ const ModalForm = <
                     <input
                       type={inp?.type}
                       placeholder={inp?.label}
+                      defaultValue={values?.[inp.name] || ""}
                       {...register(inp.name)}
                       className="border-2 p-2 rounded-lg"
                     />
@@ -140,7 +147,8 @@ const ModalForm = <
         <div className="mt-auto  flex flex-row bottom-0 m-2 justify-between  gap-6">
           {actionButtonDetails?.map((actBtn) => (
             <button
-              className={` bg-${actBtn.color}-500 font-bold p-2 rounded-lg `}
+              className={` font-bold p-2 rounded-lg `}
+              style={{ backgroundColor: actBtn.color }}
               onClick={actBtn.type === "submit" ? undefined : actBtn.action}
               type={actBtn.type}
             >
